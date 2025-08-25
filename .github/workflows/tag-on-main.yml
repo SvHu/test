@@ -1,0 +1,22 @@
+name: Tag on main push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get timestamp
+        id: vars
+        run: echo "ts=$(date +%y.%m%.d%.H%M%S)" >> $GITHUB_OUTPUT
+      - name: Create tag
+        run: |
+          git tag v-${{ steps.vars.outputs.ts }}
+          git push origin v-${{ steps.vars.outputs.ts }}
