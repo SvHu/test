@@ -1,0 +1,29 @@
+name: Trigger Deploy on Change
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - staging
+
+jobs:
+  trigger_deploy:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy on Dispatch workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy-on-dispatch.yml',
+              ref: '${{ github.sha }}',
+              inputs: {
+                source_ref: '${{ github.sha }}',
+                target_ref: 'main',
+                environment: 'demo'
+              }
+            });
