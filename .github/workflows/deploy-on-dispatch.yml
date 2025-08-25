@@ -31,7 +31,7 @@ jobs:
             await github.rest.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: '${{ github.event.inputs.source_ref }}',
+              ref: '${{ github.ref_name }}',
               environment: '${{ github.event.inputs.environment }}',
               transient_environment: false,
               description: `${{ github.event.inputs.environment }} deployment (pending)`,
@@ -49,7 +49,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'merge.yml',
-              ref: '${{ github.event.inputs.source_ref }}',
+              ref: '${{ github.ref_name }}',
               inputs: {
                 source_ref: '${{ github.event.inputs.source_ref }}',
                 target_ref: '${{ github.event.inputs.target_ref }}'
