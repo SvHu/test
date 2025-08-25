@@ -3,6 +3,7 @@ name: Deploy on dispatch
 permissions:
   contents: write
   deployments: write
+  actions: write
 on:
   workflow_dispatch:
     inputs:
