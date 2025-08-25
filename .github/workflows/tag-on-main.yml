@@ -1,5 +1,8 @@
 name: Tag on main push
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
