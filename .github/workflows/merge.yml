@@ -1,0 +1,41 @@
+name: Merge branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Branch to merge (e.g. feature/xyz)'
+        required: true
+        type: string
+      target_ref:
+        description: 'Target branch to merge into (default: main)'
+        required: false
+        default: main
+        type: string
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout target branch
+      uses: actions/checkout@v5
+      with:
+        ref: ${{ inputs.target_ref }}
+        fetch-depth: 0
+
+    - name: Merge source branch
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+        # fetch the source branch
+        git fetch origin ${{ inputs.source_ref }}:${{ inputs.source_ref }}
+
+        # merge into target branch
+        git checkout ${{ inputs.target_ref }}
+        git merge --ff-only ${{ inputs.source_ref }}
+
+        # push the result
+        git push origin ${{ inputs.target_ref }}
