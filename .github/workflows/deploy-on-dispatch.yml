@@ -1,0 +1,54 @@
+name: Deploy on dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Source ref (branch or SHA to deploy)'
+        required: true
+        type: string
+      target_ref:
+        description: 'Target ref (branch to merge into, if needed)'
+        required: true
+        type: string
+        default: main
+      environment:
+        description: 'Deployment environment name'
+        required: true
+        type: string
+
+jobs:
+  create_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create deployment (pending)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: '${{ github.event.inputs.source_ref }}',
+              environment: '${{ github.event.inputs.environment }}',
+              transient_environment: false,
+              description: `${{ github.event.inputs.environment }} deployment (pending)`,
+            });
+
+  trigger_merge:
+    needs: create_deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger merge workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'merge.yml',
+              ref: '${{ github.event.inputs.source_ref }}',
+              inputs: {
+                source_ref: '${{ github.event.inputs.source_ref }}',
+                target_ref: '${{ github.event.inputs.target_ref }}'
+              }
+            });
