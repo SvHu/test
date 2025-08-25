@@ -1,4 +1,6 @@
 name: Trigger Deploy on Change
+permissions:
+  actions: write
 
 on:
   pull_request:
