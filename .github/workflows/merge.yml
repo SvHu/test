@@ -22,7 +22,7 @@ jobs:
     - name: Checkout target branch
       uses: actions/checkout@v5
       with:
-        ref: ${{ inputs.target_ref }}
+        ref: ${{ inputs.target_ref || 'main' }}
         fetch-depth: 0
 
     - name: Merge source branch
@@ -31,11 +31,11 @@ jobs:
         git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
         # fetch the source branch
-        git fetch origin ${{ inputs.source_ref }}:${{ inputs.source_ref }}
+        git fetch origin ${{ inputs.source_ref }}
 
         # merge into target branch
         git checkout ${{ inputs.target_ref }}
-        git merge --ff-only ${{ inputs.source_ref }}
+        git merge --ff-only origin/${{ inputs.source_ref }}
 
         # push the result
         git push origin ${{ inputs.target_ref }}
