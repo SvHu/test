@@ -21,8 +21,8 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'deploy-on-dispatch.yml',
-              ref: '${{ github.ref_name }}',
+                workflow_id: 'deploy-on-dispatch.yml',
+                ref: 'staging',
               inputs: {
                 source_ref: '${{ github.sha }}',
                 target_ref: 'main',
