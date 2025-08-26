@@ -31,11 +31,12 @@ jobs:
         git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
         # fetch the source branch
-        git fetch origin ${{ inputs.source_ref }}
+        #git fetch origin ${{ inputs.source_ref }}
+        git checkout -b temp-merge-branch ${{ inputs.source_ref }}
 
-        # merge into target branch
+        # Merge source branch into checked-out target branch
         git checkout ${{ inputs.target_ref }}
-        git merge --ff-only origin/${{ inputs.source_ref }}
+        git merge --ff-only temp-merge-branch
 
         # push the result
         git push origin ${{ inputs.target_ref }}
