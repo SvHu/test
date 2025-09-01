@@ -44,3 +44,5 @@ jobs:
               context: 'Automated tests',
               description: `Status randomly set to ${randomStatus}`
             })
+      - name: Output result
+        run: echo "Automated tests status updated to ${{ needs.update_automated_test_check_status.outputs.status }}"
