@@ -1,0 +1,41 @@
+name: Mimic automated tests
+
+on:
+  push:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  set-pending:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Automated tests status to pending
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'pending',
+              context: 'Automated tests',
+              description: 'Awaiting manual QA result'
+            })
+      - name: Set Automated tests status to randomly picked
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const statuses = ['error', 'failure', 'pending', 'success'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: randomStatus,
+              context: 'Automated tests',
+              description: `Status randomly set to ${randomStatus}`
+            })
