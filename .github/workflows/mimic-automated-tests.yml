@@ -41,39 +41,41 @@ jobs:
               const statuses = ['in_progress', 'queued', 'completed'];
               const conclusions = ['success', 'failure', 'neutral', 'cancelled', 'timed_out', 'action_required', 'skipped'];
               const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+              let summary = `This is an example summary for the automated test check run.\nStatus: ${randomStatus}`;
               let checkRunParams = {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: 'Automated tests',
-                head_sha: context.sha,
-                status: randomStatus,
-                output: {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Automated tests',
+              head_sha: context.sha,
+              status: randomStatus,
+              output: {
                 title: 'Automated Test Results',
-                summary: 'This is an example summary for the automated test check run.',
+                summary: summary,
                 text: 'Detailed information about the test run can be placed here.',
                 annotations: [
-                  {
+                {
                   path: 'README.md',
                   start_line: 1,
                   end_line: 1,
                   annotation_level: 'notice',
                   message: 'Example annotation message'
-                  }
+                }
                 ],
                 images: [
-                  {
+                {
                   alt: 'Example image',
                   image_url: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
                   caption: 'Example image caption'
-                  }
-                ]
                 }
+                ]
+              }
               };
 
               if (randomStatus === 'completed') {
-                const randomConclusion = conclusions[Math.floor(Math.random() * conclusions.length)];
-                checkRunParams.conclusion = randomConclusion;
-                checkRunParams.completed_at = new Date().toISOString();
+              const randomConclusion = conclusions[Math.floor(Math.random() * conclusions.length)];
+              checkRunParams.conclusion = randomConclusion;
+              checkRunParams.completed_at = new Date().toISOString();
+              checkRunParams.output.summary += `\nConclusion: ${randomConclusion}`;
               }
 
               await github.rest.checks.create(checkRunParams);
