@@ -8,12 +8,13 @@ on:
 permissions:
   contents: read
   statuses: write
+  checks: write
 
 jobs:
   create_automated_test_check:
     runs-on: ubuntu-latest
     steps:
-      - name: Set Automated tests status to pending
+      - name: Set Automated tests commit status to pending
         uses: actions/github-script@v7
         with:
           script: |
@@ -30,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: create_automated_test_check
     steps:
-      - name: Set Automated tests status to randomly picked
+      - name: Set Automated tests check runstatus to randomly picked
         uses: actions/github-script@v7
         with:
             script: |
