@@ -1,0 +1,48 @@
+name: Create and Update Deployment
+
+permissions:
+  contents: write
+  deployments: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or SHA to deploy'
+        required: true
+        type: string
+      environment:
+        description: 'Deployment environment name'
+        required: true
+        type: string
+
+jobs:
+  create_and_update_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create deployment (pending)
+        id: create_deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: '${{ github.event.inputs.ref }}',
+              environment: '${{ github.event.inputs.environment }}',
+              transient_environment: false,
+              description: `${{ github.event.inputs.environment }} deployment (pending)`,
+              required_contexts: []
+            });
+            core.setOutput('deployment_id', deployment.data.id);
+      - name: Update deployment status to success
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.create_deployment.outputs.deployment_id }},
+              state: 'success',
+              description: 'Deployment finished successfully.'
+            });

@@ -1,0 +1,38 @@
+name: Update Deployment Status
+
+permissions:
+  contents: write
+  deployments: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: 'Deployment ID to update'
+        required: true
+        type: string
+      state:
+        description: 'Deployment state (e.g. success, failure, in_progress)'
+        required: true
+        type: string
+      environment:
+        description: 'Deployment environment name'
+        required: true
+        type: string
+
+jobs:
+  update_deployment_status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update deployment status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: Number('${{ github.event.inputs.deployment_id }}'),
+              state: '${{ github.event.inputs.state }}',
+              environment: '${{ github.event.inputs.environment }}',
+              description: `Deployment status updated to ${{ github.event.inputs.state }}`
+            });

@@ -1,0 +1,30 @@
+name: QA status on branch push
+
+on:
+  push:
+    branches:
+      - 'staging'
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  set-pending:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set QA status to pending
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'QA testing',
+              head_sha: context.sha,
+              status: 'in_progress',
+              output: {
+              title: 'QA testing',
+              summary: 'Awaiting manual QA result'
+              }
+            })
