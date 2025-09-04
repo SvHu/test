@@ -13,29 +13,29 @@ on:
         options:
           - success
           - failure
-            - neutral
-            - cancelled
-            - timed_out
-            - action_required
-            - in_progress
-            - queued
+          - neutral
+          - cancelled
+          - timed_out
+          - action_required
+          - in_progress
+          - queued
 
-        repository_dispatch:
-        types: [qa_status_update]
+  repository_dispatch:
+    types: [qa_status_update]
 
-      permissions:
-        contents: read
-        checks: write
+permissions:
+  contents: read
+  checks: write
 
-      jobs:
-        update-status:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Set from workflow_dispatch
-          if: github.event_name == 'workflow_dispatch'
-          uses: actions/github-script@v7
-          with:
-            script: |
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set from workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
             const ref = core.getInput('ref', { required: true })
             const state = core.getInput('state', { required: true })
             const validStates = [
@@ -52,16 +52,16 @@ on:
               status: ['in_progress', 'queued'].includes(state) ? 'in_progress' : 'completed',
               conclusion: ['success', 'failure', 'neutral', 'cancelled', 'timed_out', 'action_required'].includes(state) ? state : undefined,
               output: {
-              title: 'QA Status',
-              summary: `QA status set via manual trigger (${state})`
+                title: 'QA Status',
+                summary: `QA status set via manual trigger (${state})`
               }
             })
 
-          - name: Set from repository_dispatch
-          if: github.event_name == 'repository_dispatch'
-          uses: actions/github-script@v7
-          with:
-            script: |
+      - name: Set from repository_dispatch
+        if: github.event_name == 'repository_dispatch'
+        uses: actions/github-script@v7
+        with:
+          script: |
             // Expect payload:
             // {
             //   "event_type": "qa_status_update",
@@ -102,8 +102,8 @@ on:
               status: ['in_progress', 'queued'].includes(state) ? 'in_progress' : 'completed',
               conclusion: ['success', 'failure', 'neutral', 'cancelled', 'timed_out', 'action_required'].includes(state) ? state : undefined,
               output: {
-              title,
-              summary,
+                title,
+                summary,
               }
             }
             if (text) checkParams.output.text = text
